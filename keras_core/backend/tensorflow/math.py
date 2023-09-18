@@ -239,3 +239,10 @@ def istft(
 
 def rsqrt(x):
     return tf.math.rsqrt(x)
+
+def solve(a,b):
+    return tf.math.solve(a,b,,)
+def solve(a,b,adjoint=False, name=None):
+    return tf.math.solve(a,b, adjoint, name)
+
+def solve 

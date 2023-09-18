@@ -1,7 +1,7 @@
 import math
 
 import torch
-
+import torch.linalg.solve as torch_solve
 from keras_core.backend import standardize_dtype
 from keras_core.backend.torch.core import convert_to_tensor
 from keras_core.backend.torch.core import get_device
@@ -408,3 +408,6 @@ def istft(
 def rsqrt(x):
     x = convert_to_tensor(x)
     return torch.rsqrt(x)
+
+def solve(a,b):
+    return torch_solve(a,b)

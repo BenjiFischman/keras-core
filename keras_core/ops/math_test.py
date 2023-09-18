@@ -835,3 +835,16 @@ class MathOpsCorrectnessTest(testing.TestCase, parameterized.TestCase):
         x = np.array([[1, 4, 9], [16, 25, 36]], dtype="float32")
         self.assertAllClose(kmath.rsqrt(x), 1 / np.sqrt(x))
         self.assertAllClose(kmath.Rsqrt()(x), 1 / np.sqrt(x))
+
+    def test_solve(self):
+        ##test bad input
+        a = KerasTensor((3, 3), dtype="float32")
+        b = KerasTensor((None, 3), dtype="float32")
+        x = kmath.solve(a,b)
+        self.assertAllClose(kmath.solve(a,b), np.solve(a,b))
+        self.assertAllClose(kmath.solve()(x), np.solve(a,b))
+
+         ##test 1-d case
+
+         #test n-d case
+
