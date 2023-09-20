@@ -836,15 +836,39 @@ class MathOpsCorrectnessTest(testing.TestCase, parameterized.TestCase):
         self.assertAllClose(kmath.rsqrt(x), 1 / np.sqrt(x))
         self.assertAllClose(kmath.Rsqrt()(x), 1 / np.sqrt(x))
 
-    def test_solve(self):
-        ##test bad input
+    def test_solve1(self):
+        ##test bad/absent input
         a = KerasTensor((3, 3), dtype="float32")
-        b = KerasTensor((None, 3), dtype="float32")
+        b = KerasTensor((1, 3), dtype="float32")
         x = kmath.solve(a,b)
-        self.assertAllClose(kmath.solve(a,b), np.solve(a,b))
-        self.assertAllClose(kmath.solve()(x), np.solve(a,b))
+        self.assertAllClose(kmath.solve(a,b), np.linalg.solve(a,b))
+        #Response error: 
+        #ValueError: Input `A` should be A tuple or list. A's rows and columns should be equal (i.e., square). A and B should be equal in row count. Received: A={coefficient_matrix} B={ordinate_vector}
+         
+    def test_solve2(self):
+        ##test 1-d case
+        a= np.array([[5, 8, -4], [6,9,8], [4,7,-2]], dtype="double")
+        b= np.array([-18,-20,-15], dtype="double")
 
-         ##test 1-d case
+        #should return a [2,-3,1]
+        y = np.linalg.solve(a,b)
+        x = kmath.solve(a,b)
+        self.assertAllClose(y, x)
+        #Response error
+        #All input tensors must have the same rank
 
-         #test n-d case
+    def test_solve3(self):
+        ##test syntax for arrays
+        a= [[5, 8, -4], [6,9,8], [4,7,-2]]
+        b= [-18,-20,-15]
+        y = np.linalg.solve(a,b)
+        #kmath does not work
+        x = kmath.solve(a,b)
+        self.assertAllClose(y, x)
 
+        #error response
+        #Tensorflow.python.framework.errors_impl.InvalidArgumentError: Value for attr 'T' of int32 is not in the list of allowed values: double, float, half, complex64, complex128
+
+    def test_solve4(self):
+        # future n-d test once the syntax and types are figured
+        print(".")

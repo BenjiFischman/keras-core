@@ -947,10 +947,14 @@ class Solve(Operation):
 
     #naive solve assumes a sollution exists and lets the backend handle it
     def compute_output_spec(self, coefficient_matrix,ordinate_vector):
-        if not isinstance(coefficient_matrix, (tuple, list)) or len(coefficient_matrix) != len(coefficient_matrix[0]) or len(ordinate_vector[0]) != len(coefficient_matrix[0]) :
+        if not isinstance(coefficient_matrix, (tuple, list)) or not isinstance(ordinate_vector, (tuple,list)):
             raise ValueError(
                 "Input `A` should be A tuple or list. A's rows and columns should be equal (i.e., square). A and B should be equal in row count. Received: A={coefficient_matrix} B={ordinate_vector}")
-        return KerasTensor(shape=coefficient_matrix[0], dtype=ordinate_vector.dtype)
+
+        elif len(coefficient_matrix) != len(coefficient_matrix[0]) or len(ordinate_vector[0]) != len(coefficient_matrix[0]): 
+            raise ValueError("Input should have equal rank.")
+        else:
+            return KerasTensor(shape=ordinate_vector.shape, dtype=ordinate_vector.dtype)
  
     def call(self, a, b):
             a = backend.convert_to_tensor(a)
@@ -958,11 +962,11 @@ class Solve(Operation):
             return backend.math.solve(a,b) 
 
 @keras_core_export("keras_core.ops.solve")
-def solve (a,b):
-    if any_symbolic_tensors((a,)) and any_symbolic_tensors((b,)):
-        return Solve().symbolic_call(a,b)
-    a = backend.convert_to_tensor(a)
-    b = backend.convert_to_tensor(b)
+def solve (coefficient_matrix,ordinate_vector):
+    if any_symbolic_tensors((coefficient_matrix,)) and any_symbolic_tensors((ordinate_vector,)):
+        return Solve(coefficient_matrix=coefficient_matrix, ordinate_vector=ordinate_vector).symbolic_call(coefficient_matrix=coefficient_matrix, ordinate_vector=ordinate_vector)
+    a = backend.convert_to_tensor(coefficient_matrix)
+    b = backend.convert_to_tensor(ordinate_vector)
     return backend.math.solve(a,b)
 
 
