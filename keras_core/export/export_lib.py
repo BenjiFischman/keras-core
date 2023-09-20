@@ -1,7 +1,5 @@
 """Library for exporting inference-only Keras models/layers."""
 
-from jax.experimental import jax2tf
-
 from keras_core import backend
 from keras_core.api_export import keras_core_export
 from keras_core.layers import Layer
@@ -92,6 +90,16 @@ class ExportArchive:
             raise NotImplementedError(
                 "The export API is only compatible with JAX and TF backends."
             )
+
+        # TODO(nkovela): Make JAX version checking programatic.
+        if backend.backend() == "jax":
+            from jax import __version__ as jax_v
+
+            if jax_v > "0.4.15":
+                raise ValueError(
+                    "The export API is only compatible with JAX version 0.4.15 "
+                    f"and prior. Your JAX version: {jax_v}"
+                )
 
     @property
     def variables(self):
@@ -441,6 +449,8 @@ class ExportArchive:
                         self._tf_trackable._misc_assets.append(trackable)
 
     def _convert_jax2tf_function(self, fn, input_signature):
+        from jax.experimental import jax2tf
+
         shapes = []
         for spec in input_signature:
             shapes.append(self._spec_to_poly_shape(spec))
